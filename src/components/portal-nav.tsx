@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 const NAV_LINKS = [
-  { href: "/", label: "Dashboard" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/forms/refund", label: "Refund Form" },
 ];
 
@@ -28,9 +28,7 @@ export function PortalNav() {
     <nav className="flex items-center gap-1">
       {NAV_LINKS.map((link) => {
         const active =
-          link.href === "/"
-            ? pathname === "/"
-            : pathname === link.href || pathname.startsWith(`${link.href}/`);
+          pathname === link.href || pathname.startsWith(`${link.href}/`);
         return (
           <Link
             key={link.href}

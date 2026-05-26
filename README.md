@@ -43,8 +43,8 @@ npm install
 npm run dev
 ```
 
-Open <http://localhost:3000>. You'll be redirected to `/login`, then to the
-dashboard.
+Open <http://localhost:3000>. The root path `/` redirects to `/login` (or to
+`/dashboard` if already signed in).
 
 ## Scripts
 
@@ -61,12 +61,14 @@ dashboard.
 src/
   app/
     layout.tsx                       Root <html>/<body>, global metadata.
+    page.tsx                         Root redirector (→ /login or /dashboard).
     login/
       page.tsx                       Public login screen.
       login-form.tsx                 Client password form.
     (portal)/                        Route group — auth-gated.
       layout.tsx                     Auth check, portal header + nav.
-      page.tsx                       Dashboard of module cards.
+      dashboard/
+        page.tsx                     Dashboard of module cards.
       forms/
         refund/
           page.tsx                   Refund Application page.

@@ -25,7 +25,7 @@ export function LoginForm() {
         setSubmitting(false);
         return;
       }
-      router.replace("/");
+      router.replace("/dashboard");
       router.refresh();
     } catch {
       setError("Network error — please try again");

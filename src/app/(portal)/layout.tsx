@@ -14,7 +14,7 @@ export default async function PortalLayout({
     <div className="min-h-screen bg-zinc-50 pb-16 dark:bg-zinc-950">
       <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
-          <Link href="/" className="block">
+          <Link href="/dashboard" className="block">
             <p className="text-xs font-medium uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
               MW Manufacturing
             </p>
