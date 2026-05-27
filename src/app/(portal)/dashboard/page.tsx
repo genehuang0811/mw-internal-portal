@@ -20,20 +20,20 @@ export default function DashboardPage() {
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {MODULES.map((m) => (
           <li key={m.id}>
-            {m.status === "active" ? (
-              <Link
-                href={m.href}
-                className="group block h-full rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-zinc-900 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-100"
-              >
-                <ModuleCard module={m} />
-              </Link>
-            ) : (
+            {m.status === "coming-soon" ? (
               <div
                 aria-disabled="true"
                 className="block h-full cursor-not-allowed rounded-2xl border border-zinc-200 bg-zinc-50 p-5 opacity-70 dark:border-zinc-800 dark:bg-zinc-900/40"
               >
                 <ModuleCard module={m} />
               </div>
+            ) : (
+              <Link
+                href={m.href}
+                className="group block h-full rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-zinc-900 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-100"
+              >
+                <ModuleCard module={m} />
+              </Link>
             )}
           </li>
         ))}
@@ -63,6 +63,13 @@ function StatusBadge({ status }: { status: PortalModule["status"] }) {
     return (
       <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200">
         Active
+      </span>
+    );
+  }
+  if (status === "demo") {
+    return (
+      <span className="inline-flex shrink-0 items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950/60 dark:text-amber-200">
+        Demo
       </span>
     );
   }

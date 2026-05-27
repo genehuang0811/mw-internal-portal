@@ -1,4 +1,4 @@
-export type ModuleStatus = "active" | "coming-soon";
+export type ModuleStatus = "active" | "demo" | "coming-soon";
 
 export type PortalModule = {
   id: string;
@@ -22,35 +22,35 @@ export const MODULES: PortalModule[] = [
     title: "Warranty Claim",
     description: "Submit a warranty claim against a supplied product.",
     href: "/forms/warranty",
-    status: "coming-soon",
+    status: "demo",
   },
   {
     id: "insurance",
     title: "Insurance Claim",
     description: "File an insurance claim for damaged or lost goods.",
     href: "/forms/insurance",
-    status: "coming-soon",
+    status: "demo",
   },
   {
     id: "job-card",
     title: "Job Card Generator",
     description: "Create a job card for the workshop.",
     href: "/forms/job-card",
-    status: "coming-soon",
+    status: "demo",
   },
   {
     id: "vehicle-inspection",
     title: "Vehicle Drop-Off Inspection",
     description: "Capture a vehicle drop-off inspection record.",
     href: "/forms/vehicle-inspection",
-    status: "coming-soon",
+    status: "demo",
   },
   {
     id: "hr",
     title: "HR Forms",
     description: "Leave requests, onboarding, and other HR forms.",
     href: "/forms/hr",
-    status: "coming-soon",
+    status: "demo",
   },
   {
     id: "finance-approval",
@@ -58,14 +58,14 @@ export const MODULES: PortalModule[] = [
     description:
       "Request finance approval for spend, purchases, or credits.",
     href: "/forms/finance-approval",
-    status: "coming-soon",
+    status: "demo",
   },
   {
     id: "stock-request",
     title: "Stock Request",
     description: "Request stock transfer or new stock orders.",
     href: "/forms/stock-request",
-    status: "coming-soon",
+    status: "demo",
   },
   {
     id: "supplier-claim",
@@ -73,14 +73,14 @@ export const MODULES: PortalModule[] = [
     description:
       "Raise a claim against a supplier for stock or invoice issues.",
     href: "/forms/supplier-claim",
-    status: "coming-soon",
+    status: "demo",
   },
   {
     id: "ai-assistant",
     title: "MW AI Assistant",
     description: "Internal AI helper for MW staff.",
     href: "/ai-assistant",
-    status: "coming-soon",
+    status: "demo",
   },
 ];
 
