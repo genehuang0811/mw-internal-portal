@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 
-export const AUTH_COOKIE = "mw_refund_auth";
+export const AUTH_COOKIE = "mw_staff_hub_auth";
 
 function envPassword(): string {
   const pw = process.env.INTERNAL_APP_PASSWORD;

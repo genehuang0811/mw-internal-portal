@@ -1,7 +1,7 @@
 import { RefundForm } from "./refund-form";
 
 export const metadata = {
-  title: "Refund Application · MW Internal Forms Portal",
+  title: "Refund Application · MW Staff Hub",
 };
 
 export default function RefundPage() {
