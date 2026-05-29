@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/page-header";
 import { getDemoForm } from "@/lib/demo-forms";
 import { MODULES, findModuleByHref } from "@/lib/modules";
 import { moduleIcon, CATEGORY_META } from "@/lib/icons";
+import { hasDocument } from "@/lib/documents/engine";
 
 type Params = { slug: string };
 
@@ -49,7 +50,10 @@ export default async function Page({ params }: { params: Promise<Params> }) {
         {mod.id === "annual-leave" ? (
           <AnnualLeaveForm />
         ) : (
-          <DemoForm config={config} />
+          <DemoForm
+            config={config}
+            documentSlug={hasDocument(mod.id) ? mod.id : undefined}
+          />
         )}
       </div>
     );
