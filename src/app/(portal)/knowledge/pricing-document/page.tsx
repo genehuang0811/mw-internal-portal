@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/page-header";
 import { DemoNotice } from "@/components/demo-notice";
 import { PlaceholderButton } from "@/components/placeholder-button";
 import { findModuleById } from "@/lib/modules";
+import { moduleIcon, CATEGORY_META } from "@/lib/icons";
 
 const MODULE = findModuleById("pricing-document")!;
 
@@ -43,6 +44,8 @@ export default function PricingDocumentPage() {
         eyebrow="Knowledge Base · Demo"
         title={MODULE.title}
         description="The current MW pricing document. View placeholder content below."
+        icon={moduleIcon("pricing-document")}
+        iconAccent={CATEGORY_META["Knowledge Base"].accent}
         actions={
           <>
             <PlaceholderButton

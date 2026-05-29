@@ -5,6 +5,7 @@ import {
   type VehicleDimension,
 } from "@/components/vehicle-dimensions-table";
 import { findModuleById } from "@/lib/modules";
+import { moduleIcon, CATEGORY_META } from "@/lib/icons";
 
 const MODULE = findModuleById("vehicle-dimensions")!;
 
@@ -14,6 +15,7 @@ export const metadata = {
 
 const ROWS: VehicleDimension[] = [
   {
+    make: "Ford",
     vehicle: "Ford Ranger (2022+ Next-Gen)",
     chassisNotes: "Wider tub than PX; check tie-down rail spacing.",
     trayLength: "1564 mm (Double Cab)",
@@ -21,6 +23,7 @@ const ROWS: VehicleDimension[] = [
     fitmentComments: "Most popular fitment; BLIS sensors in rear bar.",
   },
   {
+    make: "Toyota",
     vehicle: "Toyota Hilux SR5 (2015+)",
     chassisNotes: "Standard tub; sail plane optional.",
     trayLength: "1525 mm (Double Cab)",
@@ -28,6 +31,7 @@ const ROWS: VehicleDimension[] = [
     fitmentComments: "Tub liner may reduce internal width slightly.",
   },
   {
+    make: "Isuzu",
     vehicle: "Isuzu D-Max (2020+)",
     chassisNotes: "Chassis rail mounts differ from earlier model.",
     trayLength: "1571 mm (Crew Cab)",
@@ -35,6 +39,7 @@ const ROWS: VehicleDimension[] = [
     fitmentComments: "Confirm tow bar wiring before rear work.",
   },
   {
+    make: "Mazda",
     vehicle: "Mazda BT-50 (2021+)",
     chassisNotes: "Shares platform with D-Max — similar mounting.",
     trayLength: "1571 mm (Double Cab)",
@@ -42,6 +47,7 @@ const ROWS: VehicleDimension[] = [
     fitmentComments: "Rear sensors present on higher trims.",
   },
   {
+    make: "Mitsubishi",
     vehicle: "Mitsubishi Triton (2019–2023)",
     chassisNotes: "Narrower tub; tray brackets must be checked.",
     trayLength: "1520 mm (Double Cab)",
@@ -49,6 +55,7 @@ const ROWS: VehicleDimension[] = [
     fitmentComments: "Confirm headboard clearance with sports bar.",
   },
   {
+    make: "Volkswagen",
     vehicle: "VW Amarok (2023+)",
     chassisNotes: "Re-badged Ranger platform; use Ranger references.",
     trayLength: "1544 mm (Double Cab)",
@@ -64,7 +71,14 @@ export default function VehicleDimensionsPage() {
         eyebrow="Knowledge Base · Demo"
         title={MODULE.title}
         description="Reference dimensions and fitment notes for common vehicles. View only for now."
+        icon={moduleIcon("vehicle-dimensions")}
+        iconAccent={CATEGORY_META["Knowledge Base"].accent}
       />
+
+      <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
+        <span>Last updated: 15 May 2026</span>
+        <span>Owner: Engineering Team</span>
+      </div>
 
       <VehicleDimensionsTable rows={ROWS} />
 

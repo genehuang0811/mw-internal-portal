@@ -3,14 +3,23 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import {
+  LayoutDashboard,
+  BookOpen,
+  Megaphone,
+  Calendar,
+  Files,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 
-const NAV_LINKS = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/knowledge/vehicle-dimensions", label: "Knowledge" },
-  { href: "/updates", label: "Updates" },
-  { href: "/calendar", label: "Calendar" },
-  { href: "/templates", label: "Templates" },
-  { href: "/ai-assistant", label: "AI" },
+const NAV_LINKS: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/knowledge/vehicle-dimensions", label: "Knowledge", icon: BookOpen },
+  { href: "/updates", label: "Updates", icon: Megaphone },
+  { href: "/calendar", label: "Calendar", icon: Calendar },
+  { href: "/templates", label: "Templates", icon: Files },
+  { href: "/ai-assistant", label: "AI", icon: Sparkles },
 ];
 
 export function PortalNav() {
@@ -38,19 +47,23 @@ export function PortalNav() {
     <>
       {/* Desktop nav */}
       <nav className="hidden items-center gap-1 lg:flex">
-        {NAV_LINKS.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={
-              isActive(link.href)
-                ? "rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
-                : "rounded-md px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            }
-          >
-            {link.label}
-          </Link>
-        ))}
+        {NAV_LINKS.map((link) => {
+          const Icon = link.icon;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={
+                isActive(link.href)
+                  ? "inline-flex items-center gap-1.5 rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+                  : "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              }
+            >
+              <Icon className="h-4 w-4" aria-hidden="true" />
+              {link.label}
+            </Link>
+          );
+        })}
         <button
           type="button"
           onClick={onLogout}
@@ -106,20 +119,24 @@ export function PortalNav() {
               className="fixed inset-0 z-10 cursor-default"
             />
             <div className="absolute right-0 z-20 mt-2 w-48 overflow-hidden rounded-md border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className={
-                    isActive(link.href)
-                      ? "block px-4 py-2 text-sm font-medium text-zinc-900 dark:text-zinc-50"
-                      : "block px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                  }
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {NAV_LINKS.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className={
+                      isActive(link.href)
+                        ? "flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-900 dark:text-zinc-50"
+                        : "flex items-center gap-2 px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    }
+                  >
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                    {link.label}
+                  </Link>
+                );
+              })}
               <div className="my-1 border-t border-zinc-200 dark:border-zinc-800" />
               <button
                 type="button"

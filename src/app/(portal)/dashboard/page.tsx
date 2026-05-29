@@ -34,23 +34,33 @@ export default function DashboardPage() {
           Quick actions
         </h2>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {QUICK_ACTIONS.map((action) => (
-            <Link
-              key={action.href}
-              href={action.href}
-              className="group flex flex-col justify-between gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-zinc-900 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-100"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <span className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-                  {action.label}
-                </span>
-                {action.active && <Badge tone="emerald">Active</Badge>}
-              </div>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                {action.description}
-              </span>
-            </Link>
-          ))}
+          {QUICK_ACTIONS.map((action) => {
+            const Icon = action.icon;
+            return (
+              <Link
+                key={action.href}
+                href={action.href}
+                className="group flex flex-col justify-between gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-zinc-900 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-100"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span
+                    className={`inline-flex h-9 w-9 items-center justify-center rounded-lg ${action.accent}`}
+                  >
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  {action.active && <Badge tone="emerald">Active</Badge>}
+                </div>
+                <div>
+                  <span className="block text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                    {action.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-zinc-500 dark:text-zinc-400">
+                    {action.description}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 

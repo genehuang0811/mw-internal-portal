@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import { ComingSoon } from "@/components/coming-soon";
 import { DemoForm } from "@/components/demo-form";
+import { AnnualLeaveForm } from "@/components/annual-leave-form";
 import { PageHeader } from "@/components/page-header";
 import { getDemoForm } from "@/lib/demo-forms";
 import { MODULES, findModuleByHref } from "@/lib/modules";
+import { moduleIcon, CATEGORY_META } from "@/lib/icons";
 
 type Params = { slug: string };
 
@@ -41,8 +43,14 @@ export default async function Page({ params }: { params: Promise<Params> }) {
           eyebrow={`${mod.category} · Demo`}
           title={mod.title}
           description={mod.description}
+          icon={moduleIcon(mod.id)}
+          iconAccent={CATEGORY_META[mod.category].accent}
         />
-        <DemoForm config={config} />
+        {mod.id === "annual-leave" ? (
+          <AnnualLeaveForm />
+        ) : (
+          <DemoForm config={config} />
+        )}
       </div>
     );
   }

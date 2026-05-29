@@ -1,15 +1,27 @@
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { DemoNotice } from "@/components/demo-notice";
 import { findModuleById } from "@/lib/modules";
+import { moduleIcon, CATEGORY_META } from "@/lib/icons";
 
 const MODULE = findModuleById("ai-assistant")!;
 
-const EXAMPLE_QUESTIONS = [
-  "How do I process a refund?",
-  "What disclaimer do I use for BLIS / sensor relocation?",
-  "Where is the vehicle drop-off inspection form?",
-  "What is the current process for annual leave?",
-  "Show me the correct Trello card example.",
+const EXAMPLE_QUESTIONS: { q: string; href: string }[] = [
+  { q: "How do I process a refund?", href: "/forms/refund" },
+  {
+    q: "What disclaimer do I use for BLIS / sensor relocation?",
+    href: "/forms/vehicle-inspection",
+  },
+  {
+    q: "Where is the vehicle drop-off inspection form?",
+    href: "/forms/vehicle-inspection",
+  },
+  {
+    q: "What is the current process for annual leave?",
+    href: "/forms/annual-leave",
+  },
+  { q: "Show me the correct Trello card example.", href: "/templates" },
 ];
 
 const CAPABILITIES = [
@@ -38,6 +50,8 @@ export default function AiAssistantPage() {
         eyebrow="AI Assistant · Demo"
         title={MODULE.title}
         description="The future brain of the portal — one place to ask anything about MW processes, forms, and resources."
+        icon={moduleIcon("ai-assistant")}
+        iconAccent={CATEGORY_META["AI Assistant"].accent}
       />
 
       <DemoNotice className="mb-6">AI not connected yet.</DemoNotice>
@@ -80,20 +94,25 @@ export default function AiAssistantPage() {
               Example questions
             </p>
             <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {EXAMPLE_QUESTIONS.map((q) => (
-                <li key={q}>
-                  <button
-                    type="button"
-                    disabled
-                    aria-disabled="true"
-                    title="Demo only — AI assistant not connected yet."
-                    className="block w-full cursor-not-allowed rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-left text-sm text-zinc-700 opacity-80 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
+              {EXAMPLE_QUESTIONS.map((item) => (
+                <li key={item.q}>
+                  <Link
+                    href={item.href}
+                    className="group flex w-full items-center justify-between gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-left text-sm text-zinc-700 shadow-sm transition-colors hover:border-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:bg-zinc-800"
                   >
-                    {q}
-                  </button>
+                    <span>{item.q}</span>
+                    <ArrowRight
+                      className="h-4 w-4 shrink-0 text-zinc-400 transition-transform group-hover:translate-x-0.5"
+                      aria-hidden="true"
+                    />
+                  </Link>
                 </li>
               ))}
             </ul>
+            <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
+              AI coming soon. These shortcuts help you find the correct page
+              today.
+            </p>
           </div>
         </div>
 

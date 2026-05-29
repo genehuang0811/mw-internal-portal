@@ -1,21 +1,14 @@
 import { PageHeader } from "@/components/page-header";
 import { DemoNotice } from "@/components/demo-notice";
 import { PlaceholderButton } from "@/components/placeholder-button";
-import { Badge, type BadgeTone } from "@/components/badge";
+import { UpdatesFeed, type Announcement } from "@/components/updates-feed";
 import { findModuleById } from "@/lib/modules";
+import { moduleIcon, CATEGORY_META } from "@/lib/icons";
 
 const MODULE = findModuleById("updates")!;
 
 export const metadata = {
   title: `${MODULE.title} · MW Staff Hub`,
-};
-
-type Announcement = {
-  category: string;
-  tone: BadgeTone;
-  title: string;
-  body: string;
-  date: string;
 };
 
 const ANNOUNCEMENTS: Announcement[] = [
@@ -47,13 +40,13 @@ const ANNOUNCEMENTS: Announcement[] = [
     body: "Expressions of interest for the FarmFest stand are open. Speak to your branch manager.",
     date: "1 week ago",
   },
-];
-
-const CATEGORIES = [
-  "Pricing Updates",
-  "Product Updates",
-  "Changes",
-  "Upcoming Events",
+  {
+    category: "Product Updates",
+    tone: "emerald",
+    title: "Updated roof rack load ratings published",
+    body: "Revised load ratings for the alloy roof rack range are now in the Knowledge Base.",
+    date: "1 week ago",
+  },
 ];
 
 export default function UpdatesPage() {
@@ -63,6 +56,8 @@ export default function UpdatesPage() {
         eyebrow="MW Updates · Demo"
         title={MODULE.title}
         description="Company news, pricing changes, and upcoming events for MW staff."
+        icon={moduleIcon("updates")}
+        iconAccent={CATEGORY_META["MW Updates"].accent}
         actions={
           <PlaceholderButton title="Admin posting not connected yet.">
             Post update
@@ -70,38 +65,7 @@ export default function UpdatesPage() {
         }
       />
 
-      <div className="flex flex-wrap gap-1.5">
-        {CATEGORIES.map((c) => (
-          <span
-            key={c}
-            className="rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
-          >
-            {c}
-          </span>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {ANNOUNCEMENTS.map((a) => (
-          <article
-            key={a.title}
-            className="flex flex-col rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <Badge tone={a.tone}>{a.category}</Badge>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                {a.date}
-              </span>
-            </div>
-            <h2 className="mt-3 text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-              {a.title}
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-              {a.body}
-            </p>
-          </article>
-        ))}
-      </div>
+      <UpdatesFeed announcements={ANNOUNCEMENTS} />
 
       <DemoNotice>Demo only — admin posting not connected yet.</DemoNotice>
     </div>

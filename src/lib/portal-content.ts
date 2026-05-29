@@ -1,4 +1,11 @@
 import type { PanelItem } from "@/components/info-panel";
+import {
+  ReceiptText,
+  ClipboardCheck,
+  Plane,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 
 /**
  * Demo content for the dashboard homepage. All data here is placeholder content
@@ -9,6 +16,8 @@ export type QuickAction = {
   label: string;
   description: string;
   href: string;
+  icon: LucideIcon;
+  accent: string;
   /** Marks the one genuinely working action. */
   active?: boolean;
 };
@@ -18,22 +27,32 @@ export const QUICK_ACTIONS: QuickAction[] = [
     label: "New Refund",
     description: "Generate a refund Excel form",
     href: "/forms/refund",
+    icon: ReceiptText,
+    accent: "bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300",
     active: true,
   },
   {
     label: "Drop-Off Inspection",
     description: "Record a vehicle drop-off",
     href: "/forms/vehicle-inspection",
+    icon: ClipboardCheck,
+    accent: "bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300",
   },
   {
     label: "Annual Leave",
     description: "Submit a leave request",
     href: "/forms/annual-leave",
+    icon: Plane,
+    accent:
+      "bg-violet-50 text-violet-600 dark:bg-violet-950/50 dark:text-violet-300",
   },
   {
     label: "Ask MW AI",
     description: "Preview the staff assistant",
     href: "/ai-assistant",
+    icon: Sparkles,
+    accent:
+      "bg-fuchsia-50 text-fuchsia-600 dark:bg-fuchsia-950/50 dark:text-fuchsia-300",
   },
 ];
 

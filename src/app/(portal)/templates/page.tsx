@@ -3,6 +3,7 @@ import { DemoNotice } from "@/components/demo-notice";
 import { ResourceCard } from "@/components/resource-card";
 import { PlaceholderButton } from "@/components/placeholder-button";
 import { findModuleById } from "@/lib/modules";
+import { moduleIcon, CATEGORY_META } from "@/lib/icons";
 
 const MODULE = findModuleById("templates")!;
 
@@ -10,7 +11,13 @@ export const metadata = {
   title: `${MODULE.title} · MW Staff Hub`,
 };
 
-type Template = { title: string; description: string };
+type Template = {
+  title: string;
+  description: string;
+  fileType: string;
+  updated: string;
+  owner: string;
+};
 
 const TEMPLATE_GROUPS: { category: string; templates: Template[] }[] = [
   {
@@ -20,11 +27,16 @@ const TEMPLATE_GROUPS: { category: string; templates: Template[] }[] = [
         title: "Daily cash record",
         description:
           "Approved layout for recording daily cash takings and reconciliation.",
+        fileType: "XLSX",
+        updated: "15 May 2026",
+        owner: "Accounts Team",
       },
       {
         title: "Transaction record sheet",
-        description:
-          "Standard transaction log for end-of-day reporting.",
+        description: "Standard transaction log for end-of-day reporting.",
+        fileType: "XLSX",
+        updated: "2 May 2026",
+        owner: "Accounts Team",
       },
     ],
   },
@@ -34,6 +46,9 @@ const TEMPLATE_GROUPS: { category: string; templates: Template[] }[] = [
       {
         title: "Weekly roster template (v3)",
         description: "Current approved weekly roster format for all branches.",
+        fileType: "XLSX",
+        updated: "10 May 2026",
+        owner: "Operations",
       },
     ],
   },
@@ -44,6 +59,9 @@ const TEMPLATE_GROUPS: { category: string; templates: Template[] }[] = [
         title: "Proper way to create a Trello card",
         description:
           "Naming conventions, checklists, and labels for workshop job cards.",
+        fileType: "Guide",
+        updated: "28 Apr 2026",
+        owner: "Workshop Lead",
       },
     ],
   },
@@ -54,11 +72,17 @@ const TEMPLATE_GROUPS: { category: string; templates: Template[] }[] = [
         title: "Custom order form example",
         description:
           "Worked example of a correctly completed custom order form.",
+        fileType: "PDF",
+        updated: "6 May 2026",
+        owner: "Sales Team",
       },
       {
         title: "Invoice / order form example",
         description:
           "Reference for a properly formatted invoice and order form.",
+        fileType: "PDF",
+        updated: "6 May 2026",
+        owner: "Sales Team",
       },
     ],
   },
@@ -69,6 +93,9 @@ const TEMPLATE_GROUPS: { category: string; templates: Template[] }[] = [
         title: "Proper procedures handbook",
         description:
           "Step-by-step reference for common workshop and sales procedures.",
+        fileType: "DOCX",
+        updated: "20 Apr 2026",
+        owner: "Management",
       },
     ],
   },
@@ -81,6 +108,8 @@ export default function TemplatesPage() {
         eyebrow="Templates & Documents · Demo"
         title={MODULE.title}
         description="Approved templates and reference examples for MW staff."
+        icon={moduleIcon("templates")}
+        iconAccent={CATEGORY_META["Templates & Documents"].accent}
       />
 
       {TEMPLATE_GROUPS.map((group) => (
@@ -94,7 +123,14 @@ export default function TemplatesPage() {
                 key={t.title}
                 title={t.title}
                 description={t.description}
+                fileType={t.fileType}
                 status="Demo"
+                meta={
+                  <>
+                    <p>Last updated: {t.updated}</p>
+                    <p>Owner: {t.owner}</p>
+                  </>
+                }
               >
                 <PlaceholderButton
                   variant="secondary"
