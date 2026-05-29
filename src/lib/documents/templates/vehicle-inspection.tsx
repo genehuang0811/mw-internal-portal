@@ -1,14 +1,48 @@
-import { View, Text } from "@react-pdf/renderer";
+/* eslint-disable jsx-a11y/alt-text -- react-pdf <Image> is not an HTML img and has no alt prop */
+import { View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import {
   MWDocument,
   Section,
   FieldRow,
   Field,
   Disclaimer,
-  SignatureBlock,
   Note,
 } from "../branding/primitives";
+import { COLOR, SIZE } from "../branding/theme";
 import type { VehicleInspectionData } from "../schemas/vehicle-inspection";
+
+const s = StyleSheet.create({
+  photoGrid: { flexDirection: "row", flexWrap: "wrap", marginHorizontal: -4 },
+  photoCell: { width: "33.33%", paddingHorizontal: 4, marginBottom: 8 },
+  photo: {
+    width: "100%",
+    height: 90,
+    objectFit: "cover",
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: COLOR.line,
+  },
+  photoLabel: { fontSize: SIZE.label, color: COLOR.muted, marginTop: 2 },
+  diagram: {
+    width: 340,
+    height: 190,
+    borderWidth: 1,
+    borderColor: COLOR.line,
+    borderRadius: 3,
+    objectFit: "contain",
+  },
+  sigRow: { flexDirection: "row", marginHorizontal: -10, marginTop: 4 },
+  sigBox: { flex: 1, marginHorizontal: 10 },
+  sigImg: { height: 48, objectFit: "contain" },
+  sigLine: { borderBottomWidth: 1, borderBottomColor: COLOR.ink, marginTop: 4 },
+  sigLabel: {
+    fontSize: SIZE.label,
+    color: COLOR.muted,
+    marginTop: 3,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+});
 
 export function VehicleInspectionTemplate({
   data,
@@ -16,6 +50,15 @@ export function VehicleInspectionTemplate({
   data: VehicleInspectionData;
 }) {
   const dropDate = data.dropOffAt.replace("T", " ");
+  const photos = [
+    { label: "Front", src: data.photoFront },
+    { label: "Rear", src: data.photoRear },
+    { label: "Left side", src: data.photoLeft },
+    { label: "Right side", src: data.photoRight },
+    { label: "Dashboard / odometer", src: data.photoDash },
+    { label: "Other", src: data.photoOther },
+  ].filter((p) => p.src);
+
   return (
     <MWDocument
       title="Vehicle Drop-Off Inspection"
@@ -51,6 +94,12 @@ export function VehicleInspectionTemplate({
         Acknowledged: {data.blisDisclaimer ? "YES" : "NO"}.
       </Disclaimer>
 
+      {data.damageDiagram ? (
+        <Section title="Damage Diagram">
+          <Image src={data.damageDiagram} style={s.diagram} />
+        </Section>
+      ) : null}
+
       <Section title="Customer Belongings">
         {data.belongings.length > 0 ? (
           <Text>{data.belongings.join(", ")}</Text>
@@ -60,20 +109,43 @@ export function VehicleInspectionTemplate({
       </Section>
 
       <Section title="Photos">
-        <Note>
-          Photos (front, rear, sides, dashboard, existing damage) to be attached
-          to this record. Cloud upload coming soon.
-        </Note>
+        {photos.length > 0 ? (
+          <View style={s.photoGrid}>
+            {photos.map((p) => (
+              <View key={p.label} style={s.photoCell}>
+                <Image src={p.src} style={s.photo} />
+                <Text style={s.photoLabel}>{p.label}</Text>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <Note>No photos attached.</Note>
+        )}
       </Section>
 
       <Section title="Sign-off">
         <FieldRow>
           <Field label="Staff member" value={data.staffMember} width="100%" />
         </FieldRow>
-        <View style={{ marginTop: 6 }}>
-          <SignatureBlock labels={["Customer signature", "Staff signature"]} />
+        <View style={s.sigRow}>
+          <SignatureColumn label="Customer signature" src={data.customerSignature} />
+          <SignatureColumn label="Staff signature" src={data.staffSignature} />
         </View>
       </Section>
     </MWDocument>
+  );
+}
+
+function SignatureColumn({ label, src }: { label: string; src: string }) {
+  return (
+    <View style={s.sigBox}>
+      {src ? (
+        <Image src={src} style={s.sigImg} />
+      ) : (
+        <View style={{ height: 48 }} />
+      )}
+      <View style={s.sigLine} />
+      <Text style={s.sigLabel}>{label}</Text>
+    </View>
   );
 }

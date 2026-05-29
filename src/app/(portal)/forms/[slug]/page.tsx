@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { ComingSoon } from "@/components/coming-soon";
 import { DemoForm } from "@/components/demo-form";
 import { AnnualLeaveForm } from "@/components/annual-leave-form";
+import { VehicleInspectionForm } from "@/components/vehicle-inspection-form";
+import { JobCardForm } from "@/components/job-card-form";
 import { PageHeader } from "@/components/page-header";
 import { getDemoForm } from "@/lib/demo-forms";
 import { MODULES, findModuleByHref } from "@/lib/modules";
@@ -49,6 +51,10 @@ export default async function Page({ params }: { params: Promise<Params> }) {
         />
         {mod.id === "annual-leave" ? (
           <AnnualLeaveForm />
+        ) : mod.id === "vehicle-inspection" ? (
+          <VehicleInspectionForm />
+        ) : mod.id === "job-card" ? (
+          <JobCardForm />
         ) : (
           <DemoForm
             config={config}
