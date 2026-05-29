@@ -19,7 +19,7 @@ export default async function PortalLayout({
               MW Manufacturing
             </p>
             <p className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-              Internal Forms Portal
+              Staff Hub
             </p>
           </Link>
           <PortalNav />

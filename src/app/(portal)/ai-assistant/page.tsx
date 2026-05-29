@@ -1,47 +1,61 @@
-import Link from "next/link";
-import { findModuleByHref } from "@/lib/modules";
+import { PageHeader } from "@/components/page-header";
+import { DemoNotice } from "@/components/demo-notice";
+import { findModuleById } from "@/lib/modules";
 
-const AI_ASSISTANT = findModuleByHref("/ai-assistant")!;
+const MODULE = findModuleById("ai-assistant")!;
 
 const EXAMPLE_QUESTIONS = [
   "How do I process a refund?",
-  "What forms do I use for insurance claims?",
-  "What is the vehicle drop-off process?",
-  "How do I submit a stock request?",
+  "What disclaimer do I use for BLIS / sensor relocation?",
+  "Where is the vehicle drop-off inspection form?",
+  "What is the current process for annual leave?",
+  "Show me the correct Trello card example.",
+];
+
+const CAPABILITIES = [
+  {
+    title: "Answer process questions",
+    body: "Refunds, claims, drop-offs, leave — the assistant will know the current procedure.",
+  },
+  {
+    title: "Find the right form or template",
+    body: "Ask where something lives and get a direct link into the portal.",
+  },
+  {
+    title: "Look up vehicle & pricing info",
+    body: "Connected to the Knowledge Base for dimensions, fitment, and pricing.",
+  },
 ];
 
 export const metadata = {
-  title: `${AI_ASSISTANT.title} · MW Internal Forms Portal`,
+  title: `${MODULE.title} · MW Staff Hub`,
 };
 
 export default function AiAssistantPage() {
   return (
     <div>
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-            Tool · Demo
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            {AI_ASSISTANT.title}
-          </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            {AI_ASSISTANT.description}
-          </p>
-        </div>
-        <Link
-          href="/dashboard"
-          className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-zinc-300 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-        >
-          Back to dashboard
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="AI Assistant · Demo"
+        title={MODULE.title}
+        description="The future brain of the portal — one place to ask anything about MW processes, forms, and resources."
+      />
 
-      <div
-        role="note"
-        className="mb-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
-      >
-        AI assistant not connected yet.
+      <DemoNotice className="mb-6">AI not connected yet.</DemoNotice>
+
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {CAPABILITIES.map((c) => (
+          <div
+            key={c.title}
+            className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+          >
+            <h3 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+              {c.title}
+            </h3>
+            <p className="mt-1 text-xs leading-5 text-zinc-600 dark:text-zinc-400">
+              {c.body}
+            </p>
+          </div>
+        ))}
       </div>
 
       <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
@@ -84,10 +98,7 @@ export default function AiAssistantPage() {
         </div>
 
         <div className="border-t border-zinc-200 px-6 py-4 dark:border-zinc-800">
-          <label
-            htmlFor="ai-input"
-            className="sr-only"
-          >
+          <label htmlFor="ai-input" className="sr-only">
             Ask the assistant
           </label>
           <div className="flex items-center gap-2">

@@ -7,6 +7,10 @@ export type DemoFieldType =
   | "datetime-local"
   | "number"
   | "select"
+  | "checkbox"
+  | "checklist"
+  | "file"
+  | "signature"
   | "note";
 
 export type DemoField = {
@@ -17,7 +21,7 @@ export type DemoField = {
   fullWidth?: boolean;
   placeholder?: string;
   options?: readonly string[];
-  /** For type="note": the body text shown in place of an input. */
+  /** For note/file/signature/checkbox: supporting body text. */
   body?: string;
 };
 
@@ -29,15 +33,26 @@ export type DemoSection = {
 
 export type DemoFormConfig = {
   submitLabel: string;
+  /** Overrides the default amber demo banner text. */
+  demoNotice?: string;
   sections: DemoSection[];
 };
 
 const STAFF_PLACEHOLDER = "e.g. Sarah Lee";
 const MANAGER_PLACEHOLDER = "e.g. Tom Nguyen";
 
+const BRANCHES = [
+  "Toowoomba",
+  "Brisbane",
+  "Sunshine Coast",
+  "Gold Coast",
+] as const;
+
 export const DEMO_FORMS: Record<string, DemoFormConfig> = {
   warranty: {
     submitLabel: "Generate warranty claim",
+    demoNotice:
+      "Demo only — future version will generate a Word/PDF claim and email management.",
     sections: [
       {
         title: "Customer & Sale",
@@ -65,7 +80,6 @@ export const DEMO_FORMS: Record<string, DemoFormConfig> = {
             id: "vehicleDetails",
             label: "Vehicle details",
             type: "text",
-            required: true,
             fullWidth: true,
             placeholder: "Year / Make / Model / Rego",
           },
@@ -90,23 +104,23 @@ export const DEMO_FORMS: Record<string, DemoFormConfig> = {
             placeholder: "Describe the fault or issue",
           },
           {
-            id: "requestedResolution",
-            label: "Requested resolution",
+            id: "requestedOutcome",
+            label: "Requested outcome",
             type: "select",
             required: true,
             options: ["Repair", "Replacement", "Refund", "Credit note"],
           },
           {
-            id: "photosNote",
-            label: "Photos",
-            type: "note",
+            id: "evidence",
+            label: "Photos / evidence",
+            type: "file",
             fullWidth: true,
-            body: "Attach product photos and invoice copies in the shared drive after submission.",
+            body: "Attach product photos and invoice copies.",
           },
         ],
       },
       {
-        title: "Staff & Approval",
+        title: "Staff & Review",
         fields: [
           {
             id: "staffMember",
@@ -177,11 +191,7 @@ export const DEMO_FORMS: Record<string, DemoFormConfig> = {
             required: true,
             fullWidth: true,
           },
-          {
-            id: "assessorName",
-            label: "Assessor name",
-            type: "text",
-          },
+          { id: "assessorName", label: "Assessor name", type: "text" },
           {
             id: "assessorContact",
             label: "Assessor contact",
@@ -204,12 +214,7 @@ export const DEMO_FORMS: Record<string, DemoFormConfig> = {
             label: "Approved repair amount (AUD)",
             type: "number",
           },
-          {
-            id: "notes",
-            label: "Notes",
-            type: "textarea",
-            fullWidth: true,
-          },
+          { id: "notes", label: "Notes", type: "textarea", fullWidth: true },
         ],
       },
     ],
@@ -221,18 +226,8 @@ export const DEMO_FORMS: Record<string, DemoFormConfig> = {
       {
         title: "Job & Customer",
         fields: [
-          {
-            id: "jobNumber",
-            label: "Job number",
-            type: "text",
-            required: true,
-          },
-          {
-            id: "customer",
-            label: "Customer",
-            type: "text",
-            required: true,
-          },
+          { id: "jobNumber", label: "Job number", type: "text", required: true },
+          { id: "customer", label: "Customer", type: "text", required: true },
           {
             id: "vehicle",
             label: "Vehicle",
@@ -278,12 +273,7 @@ export const DEMO_FORMS: Record<string, DemoFormConfig> = {
             type: "number",
             required: true,
           },
-          {
-            id: "startDate",
-            label: "Start date",
-            type: "date",
-            required: true,
-          },
+          { id: "startDate", label: "Start date", type: "date", required: true },
           {
             id: "completionNotes",
             label: "Completion notes",
@@ -297,28 +287,38 @@ export const DEMO_FORMS: Record<string, DemoFormConfig> = {
 
   "vehicle-inspection": {
     submitLabel: "Generate drop-off record",
+    demoNotice: "Demo only — Google Drive upload not connected yet.",
     sections: [
       {
         title: "Customer & Vehicle",
         fields: [
           {
             id: "customer",
-            label: "Customer",
+            label: "Customer name",
             type: "text",
             required: true,
             fullWidth: true,
           },
+          { id: "rego", label: "Vehicle rego", type: "text", required: true },
           {
-            id: "rego",
-            label: "Vehicle rego",
+            id: "makeModel",
+            label: "Vehicle make / model",
             type: "text",
             required: true,
+            placeholder: "e.g. Ford Ranger XLT",
           },
           {
             id: "odometer",
             label: "Odometer (km)",
             type: "number",
             required: true,
+          },
+          {
+            id: "fuelLevel",
+            label: "Fuel level",
+            type: "select",
+            required: true,
+            options: ["Empty", "1/4", "1/2", "3/4", "Full"],
           },
           {
             id: "dropOffAt",
@@ -329,7 +329,19 @@ export const DEMO_FORMS: Record<string, DemoFormConfig> = {
         ],
       },
       {
-        title: "Condition",
+        title: "Photos (all angles)",
+        hint: "Upload placeholders — not connected yet.",
+        fields: [
+          { id: "photoFront", label: "Front", type: "file" },
+          { id: "photoRear", label: "Rear", type: "file" },
+          { id: "photoLeft", label: "Left side", type: "file" },
+          { id: "photoRight", label: "Right side", type: "file" },
+          { id: "photoDash", label: "Dashboard / odometer", type: "file" },
+          { id: "photoDamage", label: "Existing damage", type: "file" },
+        ],
+      },
+      {
+        title: "Condition & Disclaimers",
         fields: [
           {
             id: "existingDamage",
@@ -340,29 +352,32 @@ export const DEMO_FORMS: Record<string, DemoFormConfig> = {
             placeholder: "Describe scratches, dents, or other damage",
           },
           {
-            id: "fuelLevel",
-            label: "Fuel level",
-            type: "select",
-            required: true,
-            options: ["Empty", "1/4", "1/2", "3/4", "Full"],
-          },
-          {
-            id: "photosChecklist",
-            label: "Photos checklist",
-            type: "note",
+            id: "blisDisclaimer",
+            label: "BLIS / sensor disclaimer",
+            type: "checkbox",
             fullWidth: true,
-            body: "Take photos: front, rear, both sides, dashboard, odometer, any existing damage.",
+            body: "Customer acknowledges that fitment may require relocation of sensors / BLIS components and accepts the associated disclaimer.",
           },
         ],
       },
       {
-        title: "Belongings & Staff",
+        title: "Belongings & Sign-off",
         fields: [
           {
-            id: "customerBelongings",
+            id: "belongings",
             label: "Customer belongings left in vehicle",
-            type: "textarea",
+            type: "checklist",
             fullWidth: true,
+            options: [
+              "Wallet",
+              "Phone",
+              "Keys",
+              "Sunglasses",
+              "Documents",
+              "Charging cable",
+              "Toll tag",
+              "Other",
+            ],
           },
           {
             id: "staffMember",
@@ -370,49 +385,107 @@ export const DEMO_FORMS: Record<string, DemoFormConfig> = {
             type: "text",
             required: true,
             placeholder: STAFF_PLACEHOLDER,
+          },
+          {
+            id: "signature",
+            label: "Customer signature",
+            type: "signature",
+            fullWidth: true,
+            body: "Signature capture placeholder — not connected yet.",
           },
         ],
       },
     ],
   },
 
-  hr: {
-    submitLabel: "Submit HR form",
+  "annual-leave": {
+    submitLabel: "Submit leave request",
+    demoNotice:
+      "Demo only — future version will export Word/PDF and email Accounts / Management.",
     sections: [
       {
-        title: "Submitter",
+        title: "Employee",
         fields: [
           {
-            id: "staffMember",
-            label: "Staff member",
+            id: "employeeName",
+            label: "Employee name",
             type: "text",
             required: true,
+            fullWidth: true,
             placeholder: STAFF_PLACEHOLDER,
           },
           {
-            id: "formType",
-            label: "Form type",
+            id: "leaveType",
+            label: "Leave type",
             type: "select",
             required: true,
             options: [
-              "Leave request",
-              "Incident report",
-              "Uniform request",
-              "Timesheet issue",
+              "Annual leave",
+              "Personal / carer's leave",
+              "Unpaid leave",
+              "Long service leave",
             ],
           },
           {
-            id: "date",
-            label: "Date",
-            type: "date",
+            id: "manager",
+            label: "Manager",
+            type: "text",
             required: true,
+            placeholder: MANAGER_PLACEHOLDER,
           },
+        ],
+      },
+      {
+        title: "Dates",
+        fields: [
+          { id: "startDate", label: "Start date", type: "date", required: true },
+          { id: "endDate", label: "End date", type: "date", required: true },
           {
-            id: "priority",
-            label: "Priority",
+            id: "notes",
+            label: "Reason / notes",
+            type: "textarea",
+            fullWidth: true,
+            placeholder: "Optional — any details for your manager",
+          },
+        ],
+      },
+    ],
+  },
+
+  "anonymous-feedback": {
+    submitLabel: "Submit anonymously",
+    demoNotice:
+      "Demo only — future version will send directly to support / management. Submissions are anonymous unless you add your name.",
+    sections: [
+      {
+        title: "Submission",
+        fields: [
+          {
+            id: "submissionType",
+            label: "Submission type",
             type: "select",
             required: true,
-            options: ["Low", "Medium", "High", "Urgent"],
+            options: ["Complaint", "Feedback", "Suggestion"],
+          },
+          {
+            id: "branch",
+            label: "Branch",
+            type: "select",
+            required: true,
+            options: BRANCHES,
+          },
+          {
+            id: "urgency",
+            label: "Urgency",
+            type: "select",
+            required: true,
+            options: ["Low", "Medium", "High"],
+          },
+          {
+            id: "contactName",
+            label: "Your name (optional)",
+            type: "text",
+            placeholder: "Leave blank to stay anonymous",
           },
         ],
       },
@@ -425,227 +498,94 @@ export const DEMO_FORMS: Record<string, DemoFormConfig> = {
             type: "textarea",
             required: true,
             fullWidth: true,
-            placeholder: "Describe the request or issue",
+            placeholder: "Tell us what's on your mind",
           },
           {
-            id: "manager",
-            label: "Manager",
-            type: "text",
-            required: true,
-            placeholder: MANAGER_PLACEHOLDER,
-          },
-        ],
-      },
-    ],
-  },
-
-  "finance-approval": {
-    submitLabel: "Submit approval request",
-    sections: [
-      {
-        title: "Request",
-        fields: [
-          {
-            id: "requestType",
-            label: "Request type",
-            type: "select",
-            required: true,
-            options: [
-              "Supplier payment",
-              "Customer credit",
-              "Capital purchase",
-              "Other expense",
-            ],
-          },
-          {
-            id: "supplier",
-            label: "Supplier",
-            type: "text",
-            required: true,
-          },
-          {
-            id: "amount",
-            label: "Amount (AUD)",
-            type: "number",
-            required: true,
-          },
-          {
-            id: "dueDate",
-            label: "Due date",
-            type: "date",
-            required: true,
-          },
-        ],
-      },
-      {
-        title: "Justification",
-        fields: [
-          {
-            id: "reason",
-            label: "Reason",
-            type: "textarea",
-            required: true,
-            fullWidth: true,
-          },
-          {
-            id: "approvedBy",
-            label: "Approved by",
-            type: "text",
-            placeholder: MANAGER_PLACEHOLDER,
-          },
-          {
-            id: "notes",
-            label: "Notes",
-            type: "textarea",
-            fullWidth: true,
-          },
-        ],
-      },
-    ],
-  },
-
-  "stock-request": {
-    submitLabel: "Submit stock request",
-    sections: [
-      {
-        title: "Requester",
-        fields: [
-          {
-            id: "branch",
-            label: "Branch",
-            type: "select",
-            required: true,
-            options: [
-              "Sydney",
-              "Melbourne",
-              "Brisbane",
-              "Perth",
-              "Adelaide",
-            ],
-          },
-          {
-            id: "requestedBy",
-            label: "Requested by",
-            type: "text",
-            required: true,
-            placeholder: STAFF_PLACEHOLDER,
-          },
-        ],
-      },
-      {
-        title: "Product",
-        fields: [
-          {
-            id: "product",
-            label: "Product / SKU",
-            type: "text",
-            required: true,
-            fullWidth: true,
-          },
-          {
-            id: "quantity",
-            label: "Quantity",
-            type: "number",
-            required: true,
-          },
-          {
-            id: "urgency",
-            label: "Urgency",
-            type: "select",
-            required: true,
-            options: ["Low", "Standard", "High", "Urgent"],
-          },
-          {
-            id: "supplier",
-            label: "Supplier",
-            type: "text",
-          },
-          {
-            id: "requiredDate",
-            label: "Required date",
-            type: "date",
-            required: true,
-          },
-        ],
-      },
-      {
-        title: "Notes",
-        fields: [
-          {
-            id: "notes",
-            label: "Notes",
-            type: "textarea",
-            fullWidth: true,
-          },
-        ],
-      },
-    ],
-  },
-
-  "supplier-claim": {
-    submitLabel: "Generate supplier claim",
-    sections: [
-      {
-        title: "Supplier & Invoice",
-        fields: [
-          {
-            id: "supplier",
-            label: "Supplier",
-            type: "text",
-            required: true,
-          },
-          {
-            id: "invoiceNumber",
-            label: "Invoice number",
-            type: "text",
-            required: true,
-          },
-        ],
-      },
-      {
-        title: "Issue",
-        fields: [
-          {
-            id: "productIssue",
-            label: "Product issue",
-            type: "textarea",
-            required: true,
-            fullWidth: true,
-          },
-          {
-            id: "quantityAffected",
-            label: "Quantity affected",
-            type: "number",
-            required: true,
-          },
-          {
-            id: "evidenceNote",
-            label: "Photos / evidence",
+            id: "supportNotice",
+            label: "Prefer to talk to someone?",
             type: "note",
             fullWidth: true,
-            body: "Attach photos and supporting documents in the shared drive after submission.",
+            body: "You can also email support@mwmanufacturing.com.au or speak to your manager directly.",
+          },
+        ],
+      },
+    ],
+  },
+
+  incident: {
+    submitLabel: "Submit incident report",
+    demoNotice:
+      "Demo only — future version will notify management and log to the safety register.",
+    sections: [
+      {
+        title: "Incident",
+        fields: [
+          {
+            id: "incidentAt",
+            label: "Date / time of incident",
+            type: "datetime-local",
+            required: true,
+          },
+          {
+            id: "branch",
+            label: "Branch / location",
+            type: "select",
+            required: true,
+            options: BRANCHES,
+          },
+          {
+            id: "incidentType",
+            label: "Type",
+            type: "select",
+            required: true,
+            options: ["Injury", "Near-miss", "Property damage", "Hazard", "Other"],
+          },
+          {
+            id: "injuryOccurred",
+            label: "Injury occurred",
+            type: "checkbox",
+            fullWidth: true,
+            body: "Tick if any person was injured. First aid / medical details should be noted below.",
           },
         ],
       },
       {
-        title: "Outcome",
+        title: "Details",
         fields: [
           {
-            id: "claimAmount",
-            label: "Claim amount (AUD)",
-            type: "number",
-            required: true,
+            id: "peopleInvolved",
+            label: "People involved",
+            type: "text",
+            fullWidth: true,
+            placeholder: "Names of those involved or witnesses",
           },
           {
-            id: "requestedOutcome",
-            label: "Requested outcome",
-            type: "select",
+            id: "description",
+            label: "What happened",
+            type: "textarea",
             required: true,
-            options: ["Credit note", "Replacement", "Refund", "Repair"],
+            fullWidth: true,
           },
           {
-            id: "staffMember",
-            label: "Staff member",
+            id: "actionTaken",
+            label: "Immediate action taken",
+            type: "textarea",
+            fullWidth: true,
+          },
+          {
+            id: "evidence",
+            label: "Photos / evidence",
+            type: "file",
+            fullWidth: true,
+          },
+        ],
+      },
+      {
+        title: "Reporter",
+        fields: [
+          {
+            id: "reportedBy",
+            label: "Reported by",
             type: "text",
             required: true,
             placeholder: STAFF_PLACEHOLDER,

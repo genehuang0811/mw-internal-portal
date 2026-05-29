@@ -1,8 +1,8 @@
-# MW Internal Forms Portal
+# MW Staff Hub
 
-Internal MW Manufacturing portal that hosts every staff-facing form and tool
-behind a single password gate. Staff sign in once, land on a dashboard, and
-launch the module they need.
+MW Manufacturing's internal staff hub that hosts every staff-facing form and
+tool behind a single password gate. Staff sign in once, land on a dashboard,
+and launch the module they need.
 
 Built with Next.js (App Router, Turbopack), TypeScript, Tailwind CSS, ExcelJS,
 and Zod. Deploys to Vercel.

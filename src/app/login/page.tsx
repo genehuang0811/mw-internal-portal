@@ -3,7 +3,7 @@ import { isAuthenticated } from "@/lib/auth";
 import { LoginForm } from "./login-form";
 
 export const metadata = {
-  title: "Sign in · MW Internal Forms Portal",
+  title: "Sign in · MW Staff Hub",
 };
 
 export default async function LoginPage() {
@@ -16,7 +16,7 @@ export default async function LoginPage() {
           MW Manufacturing
         </p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Internal Forms Portal
+          Staff Hub
         </h1>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
           Enter the staff password to continue.

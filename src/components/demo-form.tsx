@@ -2,14 +2,21 @@
 
 import { useState, type ReactNode } from "react";
 import type { DemoField, DemoFormConfig } from "@/lib/demo-forms";
+import { DemoNotice } from "./demo-notice";
 
 type FormState = Record<string, string>;
+
+const DISPLAY_ONLY: ReadonlyArray<DemoField["type"]> = [
+  "note",
+  "file",
+  "signature",
+];
 
 function emptyState(config: DemoFormConfig): FormState {
   const out: FormState = {};
   for (const section of config.sections) {
     for (const field of section.fields) {
-      if (field.type === "note") continue;
+      if (DISPLAY_ONLY.includes(field.type)) continue;
       out[field.id] = "";
     }
   }
@@ -27,18 +34,11 @@ export function DemoForm({ config }: { config: DemoFormConfig }) {
     setValues(emptyState(config));
   }
 
+  const notice = config.demoNotice ?? "Demo only — not connected yet.";
+
   return (
-    <form
-      noValidate
-      onSubmit={(e) => e.preventDefault()}
-      className="space-y-6"
-    >
-      <div
-        role="note"
-        className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
-      >
-        Demo only — output template not connected yet.
-      </div>
+    <form noValidate onSubmit={(e) => e.preventDefault()} className="space-y-6">
+      <DemoNotice>{notice}</DemoNotice>
 
       {config.sections.map((section, idx) => (
         <Section
@@ -71,7 +71,7 @@ export function DemoForm({ config }: { config: DemoFormConfig }) {
           type="button"
           disabled
           aria-disabled="true"
-          title="Demo only — output template not connected yet."
+          title={notice}
           className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-md bg-zinc-900 px-5 text-sm font-medium text-white opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
         >
           {config.submitLabel}
@@ -97,6 +97,77 @@ function FieldControl({
       </p>
     );
   }
+
+  if (field.type === "file") {
+    return (
+      <div className="flex flex-col items-center justify-center gap-1 rounded-md border border-dashed border-zinc-300 bg-zinc-50 px-3 py-5 text-center dark:border-zinc-700 dark:bg-zinc-900/60">
+        <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+          Upload placeholder
+        </span>
+        {field.body && (
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">
+            {field.body}
+          </span>
+        )}
+        <span className="mt-1 inline-flex cursor-not-allowed items-center rounded border border-zinc-300 bg-white px-2.5 py-1 text-xs text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-500">
+          Choose file (disabled)
+        </span>
+      </div>
+    );
+  }
+
+  if (field.type === "signature") {
+    return (
+      <div className="flex h-24 items-center justify-center rounded-md border border-dashed border-zinc-300 bg-zinc-50 text-xs text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-400">
+        {field.body ?? "Signature placeholder"}
+      </div>
+    );
+  }
+
+  if (field.type === "checkbox") {
+    const checked = value === "yes";
+    return (
+      <label className="flex items-start gap-2">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked ? "yes" : "")}
+          className="mt-0.5 h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-950"
+        />
+        <span className="text-sm text-zinc-700 dark:text-zinc-300">
+          {field.body ?? field.label}
+        </span>
+      </label>
+    );
+  }
+
+  if (field.type === "checklist") {
+    const selected = value ? value.split(",") : [];
+    const toggle = (opt: string) => {
+      const next = selected.includes(opt)
+        ? selected.filter((s) => s !== opt)
+        : [...selected, opt];
+      onChange(next.join(","));
+    };
+    return (
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {(field.options ?? []).map((opt) => (
+          <label key={opt} className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={selected.includes(opt)}
+              onChange={() => toggle(opt)}
+              className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-950"
+            />
+            <span className="text-sm text-zinc-700 dark:text-zinc-300">
+              {opt}
+            </span>
+          </label>
+        ))}
+      </div>
+    );
+  }
+
   if (field.type === "textarea") {
     return (
       <textarea
@@ -110,6 +181,7 @@ function FieldControl({
       />
     );
   }
+
   if (field.type === "select") {
     return (
       <select
@@ -128,6 +200,7 @@ function FieldControl({
       </select>
     );
   }
+
   const inputType =
     field.type === "number"
       ? "number"
@@ -194,16 +267,20 @@ function Field({
   field: DemoField;
   children: ReactNode;
 }) {
+  // Checkboxes render their own inline label.
+  const showLabel = field.type !== "checkbox";
   return (
     <div className={field.fullWidth ? "sm:col-span-2" : undefined}>
-      <label
-        htmlFor={field.id}
-        className="block text-sm font-medium text-zinc-700 dark:text-zinc-200"
-      >
-        {field.label}
-        {field.required && <span className="ml-0.5 text-red-600">*</span>}
-      </label>
-      <div className="mt-1">{children}</div>
+      {showLabel && (
+        <label
+          htmlFor={field.id}
+          className="block text-sm font-medium text-zinc-700 dark:text-zinc-200"
+        >
+          {field.label}
+          {field.required && <span className="ml-0.5 text-red-600">*</span>}
+        </label>
+      )}
+      <div className={showLabel ? "mt-1" : undefined}>{children}</div>
     </div>
   );
 }

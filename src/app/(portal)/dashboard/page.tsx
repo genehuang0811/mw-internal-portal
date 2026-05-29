@@ -1,81 +1,72 @@
 import Link from "next/link";
-import { MODULES, type PortalModule } from "@/lib/modules";
+import { DashboardGrid } from "@/components/dashboard-grid";
+import { InfoPanel } from "@/components/info-panel";
+import { Badge } from "@/components/badge";
+import { MODULES } from "@/lib/modules";
+import {
+  IMPORTANT_NOTICES,
+  QUICK_ACTIONS,
+  RECENT_UPDATES,
+} from "@/lib/portal-content";
 
 export const metadata = {
-  title: "Dashboard · MW Internal Forms Portal",
+  title: "Dashboard · MW Staff Hub",
 };
 
 export default function DashboardPage() {
   return (
-    <div>
-      <div className="mb-6">
+    <div className="space-y-8">
+      <div>
+        <p className="text-xs font-medium uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+          MW Manufacturing
+        </p>
         <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Dashboard
+          Staff Hub
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Choose an internal form or tool below.
+          Your central place for forms, knowledge, updates, and tools.
         </p>
       </div>
 
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {MODULES.map((m) => (
-          <li key={m.id}>
-            {m.status === "coming-soon" ? (
-              <div
-                aria-disabled="true"
-                className="block h-full cursor-not-allowed rounded-2xl border border-zinc-200 bg-zinc-50 p-5 opacity-70 dark:border-zinc-800 dark:bg-zinc-900/40"
-              >
-                <ModuleCard module={m} />
-              </div>
-            ) : (
-              <Link
-                href={m.href}
-                className="group block h-full rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-zinc-900 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-100"
-              >
-                <ModuleCard module={m} />
-              </Link>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function ModuleCard({ module: m }: { module: PortalModule }) {
-  return (
-    <>
-      <div className="flex items-start justify-between gap-3">
-        <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          {m.title}
+      {/* Quick actions */}
+      <section>
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+          Quick actions
         </h2>
-        <StatusBadge status={m.status} />
-      </div>
-      <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-        {m.description}
-      </p>
-    </>
-  );
-}
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {QUICK_ACTIONS.map((action) => (
+            <Link
+              key={action.href}
+              href={action.href}
+              className="group flex flex-col justify-between gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-zinc-900 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-100"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                  {action.label}
+                </span>
+                {action.active && <Badge tone="emerald">Active</Badge>}
+              </div>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                {action.description}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-function StatusBadge({ status }: { status: PortalModule["status"] }) {
-  if (status === "active") {
-    return (
-      <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200">
-        Active
-      </span>
-    );
-  }
-  if (status === "demo") {
-    return (
-      <span className="inline-flex shrink-0 items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950/60 dark:text-amber-200">
-        Demo
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-      Coming Soon
-    </span>
+      {/* Notices + recent updates */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <InfoPanel title="Important notices" items={IMPORTANT_NOTICES} />
+        <InfoPanel title="Recently updated" items={RECENT_UPDATES} />
+      </div>
+
+      {/* All modules, grouped + searchable */}
+      <section>
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+          All forms &amp; tools
+        </h2>
+        <DashboardGrid modules={MODULES} />
+      </section>
+    </div>
   );
 }

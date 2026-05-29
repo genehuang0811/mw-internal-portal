@@ -14,11 +14,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "MW Internal Forms Portal",
+    default: "MW Staff Hub",
     template: "%s",
   },
   description:
-    "Internal MW Manufacturing portal — forms, tools, and AI assistant for staff.",
+    "MW Manufacturing staff hub — forms, tools, and AI assistant for staff.",
   robots: { index: false, follow: false },
 };
 
