@@ -2,8 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import { User, UserCheck, Calculator, ArrowRight, ArrowDown } from "lucide-react";
-import { DemoNotice } from "./demo-notice";
-import { downloadDocument } from "@/lib/download-document";
+import { submitDocument, sentMessage } from "@/lib/submit-document";
 
 type Notice =
   | { kind: "success"; message: string }
@@ -86,10 +85,10 @@ export function AnnualLeaveForm() {
     }
     setSubmitting(true);
     try {
-      const result = await downloadDocument("annual-leave", values);
+      const result = await submitDocument("annual-leave", values);
       setNotice(
         result.ok
-          ? { kind: "success", message: `Generated ${result.filename}. Download started.` }
+          ? { kind: "success", message: sentMessage(result) }
           : { kind: "error", message: result.error },
       );
     } finally {
@@ -99,11 +98,6 @@ export function AnnualLeaveForm() {
 
   return (
     <form noValidate onSubmit={(e) => e.preventDefault()} className="space-y-6">
-      <DemoNotice>
-        Generates a branded MW PDF you can download. Cloud upload &amp; email
-        coming later.
-      </DemoNotice>
-
       {notice && (
         <div
           role="status"

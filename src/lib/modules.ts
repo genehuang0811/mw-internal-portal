@@ -77,7 +77,7 @@ export const MODULES: PortalModule[] = [
     title: "Annual Leave Request",
     description: "Request annual leave for manager and accounts approval.",
     href: "/forms/annual-leave",
-    status: "demo",
+    status: "active",
     category: "HR & Staff",
   },
   {
