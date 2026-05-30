@@ -86,7 +86,7 @@ export const MODULES: PortalModule[] = [
     description:
       "Submit an anonymous complaint, suggestion, or piece of feedback.",
     href: "/forms/anonymous-feedback",
-    status: "demo",
+    status: "active",
     category: "HR & Staff",
   },
   {
