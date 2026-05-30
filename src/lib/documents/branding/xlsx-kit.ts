@@ -27,18 +27,18 @@ export class MWSheet {
   private ws: ExcelJS.Worksheet;
   private row = 1;
 
-  constructor(sheetName: string, title: string, meta: string[] = []) {
+  constructor(
+    sheetName: string,
+    title: string,
+    meta: string[] = [],
+    widths: number[] = [28, 52, 18, 18],
+  ) {
     this.wb.creator = BRAND.company;
     this.ws = this.wb.addWorksheet(sheetName, {
       properties: { defaultRowHeight: 16 },
       pageSetup: { margins: { left: 0.5, right: 0.5, top: 0.6, bottom: 0.6, header: 0.3, footer: 0.3 } },
     });
-    this.ws.columns = [
-      { width: 28 },
-      { width: 52 },
-      { width: 18 },
-      { width: 18 },
-    ];
+    this.ws.columns = widths.map((width) => ({ width }));
 
     // Brand line
     const brand = this.ws.getCell(`A${this.row}`);

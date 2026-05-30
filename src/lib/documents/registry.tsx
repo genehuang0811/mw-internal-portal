@@ -9,6 +9,12 @@ import { annualLeaveSchema } from "./schemas/annual-leave";
 import { insuranceSchema } from "./schemas/insurance";
 import { jobCardSchema } from "./schemas/job-card";
 import { anonymousFeedbackSchema } from "./schemas/anonymous-feedback";
+import {
+  procurementSchema,
+  isReimbursement,
+  money,
+  currentStatuses,
+} from "./schemas/procurement";
 
 import { VehicleInspectionTemplate } from "./templates/vehicle-inspection";
 import { WarrantyTemplate } from "./templates/warranty";
@@ -23,6 +29,9 @@ import { annualLeaveDocx } from "./templates/annual-leave.docx";
 import { jobCardDocx } from "./templates/job-card.docx";
 import { jobCardXlsx } from "./templates/job-card.xlsx";
 import { anonymousFeedbackDocx } from "./templates/anonymous-feedback.docx";
+import { ProcurementTemplate } from "./templates/procurement";
+import { procurementDocx } from "./templates/procurement.docx";
+import { procurementXlsx } from "./templates/procurement.xlsx";
 
 import { leaveDays } from "./schemas/annual-leave";
 
@@ -100,6 +109,39 @@ export const DOCUMENTS: Record<string, DocumentDefinition<any, any>> = {
       `Type: ${d.submissionType}\nBranch: ${d.branch}\nUrgency: ${d.urgency}\nFrom: ${d.contactName ? d.contactName : "Anonymous"}`,
     pdf: (d) => <AnonymousFeedbackTemplate data={d} />,
     docx: anonymousFeedbackDocx,
+  }),
+
+  procurement: defineDocument({
+    slug: "procurement",
+    title: "Procurement & Reimbursement Request",
+    schema: procurementSchema,
+    recipients: recipientsFor("procurement"),
+    buildBaseName: (d) =>
+      buildBaseName("Procurement", [
+        d.requestNumber.replace(/^MW-/, ""),
+        d.staffName,
+      ]),
+    emailSubject: (d) =>
+      isReimbursement(d.requestType)
+        ? `Reimbursement Request — ${d.staffName} — ${money(d.amountPaid)}`
+        : `Procurement Request — ${d.requestTitle} — ${d.branch}`,
+    emailSummary: (d) => {
+      const costLine = isReimbursement(d.requestType)
+        ? `Amount paid: ${money(d.amountPaid)}`
+        : `Estimated cost: ${money(d.estimatedCost)}`;
+      return [
+        `Request: ${d.requestNumber}`,
+        `Type: ${d.requestType}`,
+        `Requester: ${d.staffName} — ${d.branch} / ${d.department}`,
+        `Category: ${d.category}   Priority: ${d.priority}`,
+        costLine,
+        `Required by: ${d.requiredByDate}`,
+        `Approval status: ${currentStatuses(d.requestType).join(" · ")}`,
+      ].join("\n");
+    },
+    pdf: (d) => <ProcurementTemplate data={d} />,
+    docx: procurementDocx,
+    xlsx: procurementXlsx,
   }),
 
   // Insurance stays a demo download (PDF only) via the legacy generate route.

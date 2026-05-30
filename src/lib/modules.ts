@@ -25,6 +25,8 @@ export type PortalModule = {
   href: string;
   status: ModuleStatus;
   category: ModuleCategory;
+  /** Extra search terms beyond title/description/category. */
+  keywords?: string[];
 };
 
 export const MODULES: PortalModule[] = [
@@ -61,6 +63,34 @@ export const MODULES: PortalModule[] = [
     href: "/forms/job-card",
     status: "active",
     category: "Operations",
+  },
+  {
+    id: "procurement",
+    title: "Procurement & Reimbursement",
+    description:
+      "Request business purchases or reimbursement for work-related expenses.",
+    href: "/forms/procurement",
+    status: "active",
+    category: "Operations",
+    keywords: [
+      "procurement",
+      "reimbursement",
+      "purchase",
+      "tools",
+      "equipment",
+      "office supplies",
+      "travel",
+      "training",
+      "vehicle parts",
+      "marketing",
+      "PPE",
+      "IT",
+      "software",
+      "expenses",
+      "supplier",
+      "receipt",
+      "invoice",
+    ],
   },
   {
     id: "insurance",

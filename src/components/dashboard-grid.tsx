@@ -32,7 +32,8 @@ export function DashboardGrid({ modules }: { modules: PortalModule[] }) {
       return (
         m.title.toLowerCase().includes(q) ||
         m.description.toLowerCase().includes(q) ||
-        m.category.toLowerCase().includes(q)
+        m.category.toLowerCase().includes(q) ||
+        (m.keywords?.some((k) => k.toLowerCase().includes(q)) ?? false)
       );
     });
     return groupByCategory(filtered);

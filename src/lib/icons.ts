@@ -16,6 +16,7 @@ import {
   Ruler,
   Tag,
   Calendar,
+  ShoppingCart,
   type LucideIcon,
 } from "lucide-react";
 import type { ModuleCategory } from "./modules";
@@ -61,6 +62,7 @@ export const MODULE_ICONS: Record<string, LucideIcon> = {
   warranty: ShieldCheck,
   "vehicle-inspection": ClipboardCheck,
   "job-card": ClipboardList,
+  procurement: ShoppingCart,
   insurance: Umbrella,
   "annual-leave": Plane,
   "anonymous-feedback": MessageSquare,

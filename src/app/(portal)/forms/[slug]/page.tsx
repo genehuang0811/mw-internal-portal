@@ -7,6 +7,7 @@ import { VehicleInspectionForm } from "@/components/vehicle-inspection-form";
 import { JobCardForm } from "@/components/job-card-form";
 import { WarrantyForm } from "@/components/warranty-form";
 import { AnonymousFeedbackForm } from "@/components/anonymous-feedback-form";
+import { ProcurementForm } from "@/components/procurement-form";
 import { PageHeader } from "@/components/page-header";
 import { getDemoForm } from "@/lib/demo-forms";
 import { MODULES, findModuleByHref } from "@/lib/modules";
@@ -26,6 +27,7 @@ const BESPOKE_FORMS: Record<string, () => ReactNode> = {
   "job-card": () => <JobCardForm />,
   warranty: () => <WarrantyForm />,
   "anonymous-feedback": () => <AnonymousFeedbackForm />,
+  procurement: () => <ProcurementForm />,
 };
 
 export function generateStaticParams(): Array<Params> {
