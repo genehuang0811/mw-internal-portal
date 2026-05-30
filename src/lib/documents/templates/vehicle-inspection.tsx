@@ -53,10 +53,12 @@ export function VehicleInspectionTemplate({
   const photos = [
     { label: "Front", src: data.photoFront },
     { label: "Rear", src: data.photoRear },
-    { label: "Left side", src: data.photoLeft },
-    { label: "Right side", src: data.photoRight },
-    { label: "Dashboard / odometer", src: data.photoDash },
-    { label: "Other", src: data.photoOther },
+    { label: "Driver side", src: data.photoDriver },
+    { label: "Passenger side", src: data.photoPassenger },
+    { label: "Roof", src: data.photoRoof },
+    { label: "Tray", src: data.photoTray },
+    { label: "Canopy", src: data.photoCanopy },
+    { label: "Interior", src: data.photoInterior },
   ].filter((p) => p.src);
 
   return (
@@ -67,9 +69,10 @@ export function VehicleInspectionTemplate({
       <Section title="Customer & Vehicle">
         <FieldRow>
           <Field label="Customer" value={data.customer} width="100%" />
-          <Field label="Vehicle rego" value={data.rego} />
-          <Field label="Make / model" value={data.makeModel} />
+          <Field label="Vehicle registration" value={data.rego} />
           <Field label="Odometer (km)" value={data.odometer} />
+          <Field label="Make" value={data.make} />
+          <Field label="Model" value={data.model} />
           <Field label="Fuel level" value={data.fuelLevel} />
           <Field label="Drop-off date / time" value={dropDate} width="100%" />
         </FieldRow>

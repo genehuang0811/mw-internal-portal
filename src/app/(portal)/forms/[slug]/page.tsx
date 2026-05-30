@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { ComingSoon } from "@/components/coming-soon";
 import { DemoForm } from "@/components/demo-form";
@@ -11,6 +12,17 @@ import { moduleIcon, CATEGORY_META } from "@/lib/icons";
 import { hasDocument } from "@/lib/documents/engine";
 
 type Params = { slug: string };
+
+/**
+ * Bespoke live forms that generate a real document via the engine. These render
+ * regardless of demo/active status (an active module must NOT fall through to
+ * the ComingSoon placeholder).
+ */
+const BESPOKE_FORMS: Record<string, () => ReactNode> = {
+  "annual-leave": () => <AnnualLeaveForm />,
+  "vehicle-inspection": () => <VehicleInspectionForm />,
+  "job-card": () => <JobCardForm />,
+};
 
 export function generateStaticParams(): Array<Params> {
   return MODULES.filter(
@@ -37,6 +49,23 @@ export default async function Page({ params }: { params: Promise<Params> }) {
   const mod = findModuleByHref(`/forms/${slug}`);
   if (!mod) notFound();
 
+  const renderBespoke = BESPOKE_FORMS[mod.id];
+  if (renderBespoke) {
+    const isDemo = mod.status === "demo";
+    return (
+      <div>
+        <PageHeader
+          eyebrow={isDemo ? `${mod.category} · Demo` : mod.category}
+          title={mod.title}
+          description={mod.description}
+          icon={moduleIcon(mod.id)}
+          iconAccent={CATEGORY_META[mod.category].accent}
+        />
+        {renderBespoke()}
+      </div>
+    );
+  }
+
   if (mod.status === "demo") {
     const config = getDemoForm(mod.id);
     if (!config) notFound();
@@ -49,18 +78,10 @@ export default async function Page({ params }: { params: Promise<Params> }) {
           icon={moduleIcon(mod.id)}
           iconAccent={CATEGORY_META[mod.category].accent}
         />
-        {mod.id === "annual-leave" ? (
-          <AnnualLeaveForm />
-        ) : mod.id === "vehicle-inspection" ? (
-          <VehicleInspectionForm />
-        ) : mod.id === "job-card" ? (
-          <JobCardForm />
-        ) : (
-          <DemoForm
-            config={config}
-            documentSlug={hasDocument(mod.id) ? mod.id : undefined}
-          />
-        )}
+        <DemoForm
+          config={config}
+          documentSlug={hasDocument(mod.id) ? mod.id : undefined}
+        />
       </div>
     );
   }

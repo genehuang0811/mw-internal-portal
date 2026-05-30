@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { DemoNotice } from "./demo-notice";
 import { SignaturePad } from "./capture/signature-pad";
 import { PhotoInput } from "./capture/photo-input";
 import { DamageAnnotator } from "./capture/damage-annotator";
@@ -15,7 +14,8 @@ import {
   NoticeBanner,
   type Notice,
 } from "./capture/form-ui";
-import { downloadDocument } from "@/lib/download-document";
+import { submitDocument, sentMessage } from "@/lib/submit-document";
+import { vehicleInspectionSchema } from "@/lib/documents/schemas/vehicle-inspection";
 
 const FUEL = ["Empty", "1/4", "1/2", "3/4", "Full"];
 const BELONGINGS = [
@@ -32,7 +32,8 @@ const BELONGINGS = [
 const EMPTY = {
   customer: "",
   rego: "",
-  makeModel: "",
+  make: "",
+  model: "",
   odometer: "",
   fuelLevel: "",
   dropOffAt: "",
@@ -41,37 +42,39 @@ const EMPTY = {
   staffMember: "",
 };
 
-const REQUIRED: [keyof typeof EMPTY, string][] = [
-  ["customer", "Customer name"],
-  ["rego", "Vehicle rego"],
-  ["makeModel", "Make / model"],
-  ["odometer", "Odometer"],
-  ["fuelLevel", "Fuel level"],
-  ["dropOffAt", "Drop-off date / time"],
-  ["existingDamage", "Existing damage notes"],
-  ["staffMember", "Staff member"],
-];
+const EMPTY_PHOTOS = {
+  front: "",
+  rear: "",
+  driver: "",
+  passenger: "",
+  roof: "",
+  tray: "",
+  canopy: "",
+  interior: "",
+};
 
 export function VehicleInspectionForm() {
   const [v, setV] = useState(EMPTY);
   const [blis, setBlis] = useState(false);
   const [belongings, setBelongings] = useState<string[]>([]);
-  const [photos, setPhotos] = useState({
-    front: "",
-    rear: "",
-    left: "",
-    right: "",
-    dash: "",
-    other: "",
-  });
+  const [photos, setPhotos] = useState(EMPTY_PHOTOS);
   const [damageDiagram, setDamageDiagram] = useState("");
   const [customerSignature, setCustomerSignature] = useState("");
   const [staffSignature, setStaffSignature] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const set = (k: keyof typeof EMPTY) => (val: string) =>
+  const set = (k: keyof typeof EMPTY) => (val: string) => {
     setV((s) => ({ ...s, [k]: val }));
+    if (errors[k]) {
+      setErrors((e) => {
+        const rest = { ...e };
+        delete rest[k];
+        return rest;
+      });
+    }
+  };
   const setPhoto = (k: keyof typeof photos) => (val: string) =>
     setPhotos((s) => ({ ...s, [k]: val }));
 
@@ -85,42 +88,64 @@ export function VehicleInspectionForm() {
     setV(EMPTY);
     setBlis(false);
     setBelongings([]);
-    setPhotos({ front: "", rear: "", left: "", right: "", dash: "", other: "" });
+    setPhotos(EMPTY_PHOTOS);
     setDamageDiagram("");
     setCustomerSignature("");
     setStaffSignature("");
     setNotice(null);
+    setErrors({});
   }
 
   async function onGenerate() {
     setNotice(null);
-    const missing = REQUIRED.filter(([k]) => !v[k]?.trim());
-    if (missing.length > 0) {
+
+    // Raw string payload — the shape the document schema validates and the
+    // server re-parses. Validate client-side with the SAME schema so on-screen
+    // errors match exactly what the engine would reject.
+    const payload = {
+      ...v,
+      blisDisclaimer: blis ? "yes" : "",
+      belongings: belongings.join(","),
+      photoFront: photos.front,
+      photoRear: photos.rear,
+      photoDriver: photos.driver,
+      photoPassenger: photos.passenger,
+      photoRoof: photos.roof,
+      photoTray: photos.tray,
+      photoCanopy: photos.canopy,
+      photoInterior: photos.interior,
+      damageDiagram,
+      customerSignature,
+      staffSignature,
+    };
+
+    const parsed = vehicleInspectionSchema.safeParse(payload);
+    if (!parsed.success) {
+      const flat = parsed.error.flatten();
+      const fieldErrs: Record<string, string> = {};
+      for (const [k, msgs] of Object.entries(flat.fieldErrors)) {
+        if (msgs && msgs.length > 0) fieldErrs[k] = msgs[0]!;
+      }
+      setErrors(fieldErrs);
       setNotice({
         kind: "error",
-        message: `Please complete: ${missing.map(([, l]) => l).join(", ")}.`,
+        message: "Please fix the highlighted fields and try again.",
       });
+      const firstKey = Object.keys(fieldErrs)[0];
+      if (firstKey) {
+        const el = document.getElementById(`field-${firstKey}`);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
+
+    setErrors({});
     setSubmitting(true);
     try {
-      const result = await downloadDocument("vehicle-inspection", {
-        ...v,
-        blisDisclaimer: blis ? "yes" : "",
-        belongings: belongings.join(","),
-        photoFront: photos.front,
-        photoRear: photos.rear,
-        photoLeft: photos.left,
-        photoRight: photos.right,
-        photoDash: photos.dash,
-        photoOther: photos.other,
-        damageDiagram,
-        customerSignature,
-        staffSignature,
-      });
+      const result = await submitDocument("vehicle-inspection", payload);
       setNotice(
         result.ok
-          ? { kind: "success", message: `Generated ${result.filename}. Download started.` }
+          ? { kind: "success", message: sentMessage(result) }
           : { kind: "error", message: result.error },
       );
     } finally {
@@ -130,48 +155,58 @@ export function VehicleInspectionForm() {
 
   return (
     <form noValidate onSubmit={(e) => e.preventDefault()} className="space-y-6">
-      <DemoNotice>
-        Generates a branded MW PDF (photos, signatures &amp; damage marks
-        embedded). Cloud upload &amp; email coming later.
-      </DemoNotice>
-
       <NoticeBanner notice={notice} />
 
       <Section number={1} title="Customer & Vehicle">
-        <Field label="Customer name" required full>
+        <Field id="customer" label="Customer name" required full error={errors.customer}>
           <Input value={v.customer} onChange={set("customer")} />
         </Field>
-        <Field label="Vehicle rego" required>
+        <Field id="rego" label="Vehicle registration" required error={errors.rego}>
           <Input value={v.rego} onChange={set("rego")} />
         </Field>
-        <Field label="Make / model" required>
-          <Input value={v.makeModel} onChange={set("makeModel")} placeholder="e.g. Ford Ranger XLT" />
-        </Field>
-        <Field label="Odometer (km)" required>
+        <Field id="odometer" label="Odometer (km)" required error={errors.odometer}>
           <Input value={v.odometer} onChange={set("odometer")} type="number" />
         </Field>
-        <Field label="Fuel level" required>
+        <Field id="make" label="Make" required error={errors.make}>
+          <Input value={v.make} onChange={set("make")} placeholder="e.g. Ford" />
+        </Field>
+        <Field id="model" label="Model" required error={errors.model}>
+          <Input value={v.model} onChange={set("model")} placeholder="e.g. Ranger XLT" />
+        </Field>
+        <Field id="fuelLevel" label="Fuel level" required error={errors.fuelLevel}>
           <Select value={v.fuelLevel} onChange={set("fuelLevel")} options={FUEL} />
         </Field>
-        <Field label="Drop-off date / time" required full>
+        <Field id="dropOffAt" label="Drop-off date / time" required full error={errors.dropOffAt}>
           <Input value={v.dropOffAt} onChange={set("dropOffAt")} type="datetime-local" />
         </Field>
       </Section>
 
       <Section number={2} title="Photos (all angles)">
-        <div className="sm:col-span-2 grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <div className="sm:col-span-2 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <PhotoInput label="Front" value={photos.front} onChange={setPhoto("front")} />
           <PhotoInput label="Rear" value={photos.rear} onChange={setPhoto("rear")} />
-          <PhotoInput label="Left side" value={photos.left} onChange={setPhoto("left")} />
-          <PhotoInput label="Right side" value={photos.right} onChange={setPhoto("right")} />
-          <PhotoInput label="Dashboard / odometer" value={photos.dash} onChange={setPhoto("dash")} />
-          <PhotoInput label="Other" value={photos.other} onChange={setPhoto("other")} />
+          <PhotoInput label="Driver side" value={photos.driver} onChange={setPhoto("driver")} />
+          <PhotoInput label="Passenger side" value={photos.passenger} onChange={setPhoto("passenger")} />
+          <PhotoInput label="Roof" value={photos.roof} onChange={setPhoto("roof")} />
+          <PhotoInput label="Tray" value={photos.tray} onChange={setPhoto("tray")} />
+          <PhotoInput label="Canopy" value={photos.canopy} onChange={setPhoto("canopy")} />
+          <PhotoInput label="Interior" value={photos.interior} onChange={setPhoto("interior")} />
         </div>
       </Section>
 
       <Section number={3} title="Condition & Damage">
-        <Field label="Existing damage notes" required full>
-          <Textarea value={v.existingDamage} onChange={set("existingDamage")} placeholder="Describe scratches, dents, or other damage" />
+        <Field
+          id="existingDamage"
+          label="Existing damage notes"
+          required
+          full
+          error={errors.existingDamage}
+        >
+          <Textarea
+            value={v.existingDamage}
+            onChange={set("existingDamage")}
+            placeholder="Describe scratches, dents, or other damage"
+          />
         </Field>
         <div className="sm:col-span-2">
           <DamageAnnotator onChange={setDamageDiagram} />
@@ -211,7 +246,7 @@ export function VehicleInspectionForm() {
             ))}
           </div>
         </div>
-        <Field label="Staff member" required full>
+        <Field id="staffMember" label="Staff member" required full error={errors.staffMember}>
           <Input value={v.staffMember} onChange={set("staffMember")} placeholder="e.g. Sarah Lee" />
         </Field>
         <Field label="Additional notes" full>
@@ -223,7 +258,7 @@ export function VehicleInspectionForm() {
         </div>
       </Section>
 
-      <Buttons submitting={submitting} onReset={reset} onGenerate={onGenerate} label="Generate drop-off record" />
+      <Buttons submitting={submitting} onReset={reset} onGenerate={onGenerate} label="Send drop-off record" />
     </form>
   );
 }

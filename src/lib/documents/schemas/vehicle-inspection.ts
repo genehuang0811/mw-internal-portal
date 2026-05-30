@@ -9,8 +9,9 @@ const imageOpt = z
 
 export const vehicleInspectionSchema = z.object({
   customer: req("Customer name"),
-  rego: req("Vehicle rego"),
-  makeModel: req("Vehicle make / model"),
+  rego: req("Vehicle registration"),
+  make: req("Vehicle make"),
+  model: req("Vehicle model"),
   odometer: req("Odometer"),
   fuelLevel: req("Fuel level"),
   dropOffAt: req("Drop-off date / time"),
@@ -23,10 +24,12 @@ export const vehicleInspectionSchema = z.object({
   // Captured media (data URLs) — embedded into the PDF, no external storage.
   photoFront: imageOpt,
   photoRear: imageOpt,
-  photoLeft: imageOpt,
-  photoRight: imageOpt,
-  photoDash: imageOpt,
-  photoOther: imageOpt,
+  photoDriver: imageOpt,
+  photoPassenger: imageOpt,
+  photoRoof: imageOpt,
+  photoTray: imageOpt,
+  photoCanopy: imageOpt,
+  photoInterior: imageOpt,
   damageDiagram: imageOpt,
   customerSignature: imageOpt,
   staffSignature: imageOpt,

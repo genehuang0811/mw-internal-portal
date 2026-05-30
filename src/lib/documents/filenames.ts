@@ -9,6 +9,20 @@ export function safe(value: string, max = 40): string {
 }
 
 /**
+ * Build a consistent MW document base name (no extension):
+ *   MW-<Doc>-<part1>-<part2>-YYYY-MM-DD
+ */
+export function buildBaseName(
+  doc: string,
+  parts: Array<string | undefined>,
+): string {
+  const cleaned = parts
+    .map((p) => (p ? safe(p, 30) : ""))
+    .filter(Boolean);
+  return ["MW", safe(doc, 30), ...cleaned, dateStamp()].join("-");
+}
+
+/**
  * Build a consistent MW document filename:
  *   MW-<Doc>-<part1>-<part2>-YYYY-MM-DD.pdf
  */
@@ -17,8 +31,5 @@ export function buildFilename(
   parts: Array<string | undefined>,
   ext = "pdf",
 ): string {
-  const cleaned = parts
-    .map((p) => (p ? safe(p, 30) : ""))
-    .filter(Boolean);
-  return ["MW", safe(doc, 30), ...cleaned, dateStamp()].join("-") + "." + ext;
+  return buildBaseName(doc, parts) + "." + ext;
 }

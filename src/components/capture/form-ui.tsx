@@ -27,23 +27,34 @@ export function Section({
 }
 
 export function Field({
+  id,
   label,
   required,
   full,
+  error,
   children,
 }: {
+  /** When set, wraps the field as `field-{id}` so errors can be scrolled to. */
+  id?: string;
   label: string;
   required?: boolean;
   full?: boolean;
+  error?: string;
   children: ReactNode;
 }) {
   return (
-    <div className={full ? "sm:col-span-2" : undefined}>
+    <div
+      id={id ? `field-${id}` : undefined}
+      className={full ? "sm:col-span-2" : undefined}
+    >
       <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200">
         {label}
         {required && <span className="ml-0.5 text-red-600">*</span>}
       </label>
       <div className="mt-1">{children}</div>
+      {error && (
+        <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p>
+      )}
     </div>
   );
 }

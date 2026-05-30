@@ -51,7 +51,7 @@ export const MODULES: PortalModule[] = [
     title: "Vehicle Drop-Off Inspection",
     description: "Capture a detailed vehicle drop-off inspection record.",
     href: "/forms/vehicle-inspection",
-    status: "demo",
+    status: "active",
     category: "Operations",
   },
   {
