@@ -3,6 +3,12 @@
 import { useState, type ReactNode } from "react";
 import type { DemoField, DemoFormConfig } from "@/lib/demo-forms";
 import { DemoNotice } from "./demo-notice";
+import { downloadDocument } from "@/lib/download-document";
+
+type Notice =
+  | { kind: "success"; message: string }
+  | { kind: "error"; message: string }
+  | null;
 
 type FormState = Record<string, string>;
 
@@ -23,8 +29,19 @@ function emptyState(config: DemoFormConfig): FormState {
   return out;
 }
 
-export function DemoForm({ config }: { config: DemoFormConfig }) {
+export function DemoForm({
+  config,
+  documentSlug,
+}: {
+  config: DemoFormConfig;
+  /** When set, the form is live: submit generates a PDF via the engine. */
+  documentSlug?: string;
+}) {
   const [values, setValues] = useState<FormState>(() => emptyState(config));
+  const [submitting, setSubmitting] = useState(false);
+  const [notice, setNotice] = useState<Notice>(null);
+
+  const live = Boolean(documentSlug);
 
   function set(name: string, v: string) {
     setValues((s) => ({ ...s, [name]: v }));
@@ -32,13 +49,69 @@ export function DemoForm({ config }: { config: DemoFormConfig }) {
 
   function reset() {
     setValues(emptyState(config));
+    setNotice(null);
   }
 
-  const notice = config.demoNotice ?? "Demo only — not connected yet.";
+  function missingRequired(): string[] {
+    const missing: string[] = [];
+    for (const section of config.sections) {
+      for (const field of section.fields) {
+        if (DISPLAY_ONLY.includes(field.type)) continue;
+        if (field.required && !values[field.id]?.trim()) {
+          missing.push(field.label);
+        }
+      }
+    }
+    return missing;
+  }
+
+  async function onGenerate() {
+    if (!documentSlug) return;
+    setNotice(null);
+    const missing = missingRequired();
+    if (missing.length > 0) {
+      setNotice({
+        kind: "error",
+        message: `Please complete: ${missing.join(", ")}.`,
+      });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const result = await downloadDocument(documentSlug, values);
+      if (result.ok) {
+        setNotice({
+          kind: "success",
+          message: `Generated ${result.filename}. Download started.`,
+        });
+      } else {
+        setNotice({ kind: "error", message: result.error });
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const bannerText = live
+    ? "Generates a branded MW PDF you can download. Cloud upload & email coming later."
+    : (config.demoNotice ?? "Demo only — not connected yet.");
 
   return (
     <form noValidate onSubmit={(e) => e.preventDefault()} className="space-y-6">
-      <DemoNotice>{notice}</DemoNotice>
+      <DemoNotice>{bannerText}</DemoNotice>
+
+      {notice && (
+        <div
+          role="status"
+          className={
+            notice.kind === "success"
+              ? "rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200"
+              : "rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200"
+          }
+        >
+          {notice.message}
+        </div>
+      )}
 
       {config.sections.map((section, idx) => (
         <Section
@@ -63,19 +136,31 @@ export function DemoForm({ config }: { config: DemoFormConfig }) {
         <button
           type="button"
           onClick={reset}
-          className="inline-flex h-10 items-center justify-center rounded-md border border-zinc-300 bg-white px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          disabled={submitting}
+          className="inline-flex h-10 items-center justify-center rounded-md border border-zinc-300 bg-white px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
         >
           Reset form
         </button>
-        <button
-          type="button"
-          disabled
-          aria-disabled="true"
-          title={notice}
-          className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-md bg-zinc-900 px-5 text-sm font-medium text-white opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
-        >
-          {config.submitLabel}
-        </button>
+        {live ? (
+          <button
+            type="button"
+            onClick={onGenerate}
+            disabled={submitting}
+            className="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
+          >
+            {submitting ? "Generating…" : config.submitLabel}
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            title={bannerText}
+            className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-md bg-zinc-900 px-5 text-sm font-medium text-white opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
+          >
+            {config.submitLabel}
+          </button>
+        )}
       </div>
     </form>
   );

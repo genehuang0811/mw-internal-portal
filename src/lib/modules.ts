@@ -43,7 +43,7 @@ export const MODULES: PortalModule[] = [
     title: "Warranty Claim Submission",
     description: "Submit a warranty claim against a supplied product.",
     href: "/forms/warranty",
-    status: "demo",
+    status: "active",
     category: "Operations",
   },
   {
@@ -51,7 +51,7 @@ export const MODULES: PortalModule[] = [
     title: "Vehicle Drop-Off Inspection",
     description: "Capture a detailed vehicle drop-off inspection record.",
     href: "/forms/vehicle-inspection",
-    status: "demo",
+    status: "active",
     category: "Operations",
   },
   {
@@ -59,7 +59,7 @@ export const MODULES: PortalModule[] = [
     title: "Job Card Generator",
     description: "Create a job card for the workshop.",
     href: "/forms/job-card",
-    status: "demo",
+    status: "active",
     category: "Operations",
   },
   {
@@ -77,7 +77,7 @@ export const MODULES: PortalModule[] = [
     title: "Annual Leave Request",
     description: "Request annual leave for manager and accounts approval.",
     href: "/forms/annual-leave",
-    status: "demo",
+    status: "active",
     category: "HR & Staff",
   },
   {
@@ -86,7 +86,7 @@ export const MODULES: PortalModule[] = [
     description:
       "Submit an anonymous complaint, suggestion, or piece of feedback.",
     href: "/forms/anonymous-feedback",
-    status: "demo",
+    status: "active",
     category: "HR & Staff",
   },
   {

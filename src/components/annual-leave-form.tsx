@@ -2,7 +2,12 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import { User, UserCheck, Calculator, ArrowRight, ArrowDown } from "lucide-react";
-import { DemoNotice } from "./demo-notice";
+import { submitDocument, sentMessage } from "@/lib/submit-document";
+
+type Notice =
+  | { kind: "success"; message: string }
+  | { kind: "error"; message: string }
+  | null;
 
 const LEAVE_TYPES = [
   "Annual leave",
@@ -40,6 +45,8 @@ function inclusiveDays(start: string, end: string): number | null {
 
 export function AnnualLeaveForm() {
   const [values, setValues] = useState<State>(EMPTY);
+  const [submitting, setSubmitting] = useState(false);
+  const [notice, setNotice] = useState<Notice>(null);
 
   const set =
     (name: keyof State) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -51,12 +58,58 @@ export function AnnualLeaveForm() {
   );
   const invalidRange = days !== null && days < 1;
 
+  async function onGenerate() {
+    setNotice(null);
+    const missing = (
+      [
+        ["employeeName", "Employee name"],
+        ["leaveType", "Leave type"],
+        ["manager", "Manager"],
+        ["startDate", "Start date"],
+        ["endDate", "End date"],
+      ] as const
+    ).filter(([k]) => !values[k]?.trim());
+    if (missing.length > 0) {
+      setNotice({
+        kind: "error",
+        message: `Please complete: ${missing.map(([, l]) => l).join(", ")}.`,
+      });
+      return;
+    }
+    if (invalidRange) {
+      setNotice({
+        kind: "error",
+        message: "End date cannot be before the start date.",
+      });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const result = await submitDocument("annual-leave", values);
+      setNotice(
+        result.ok
+          ? { kind: "success", message: sentMessage(result) }
+          : { kind: "error", message: result.error },
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <form noValidate onSubmit={(e) => e.preventDefault()} className="space-y-6">
-      <DemoNotice>
-        Demo only — future version will export Word/PDF and email Accounts /
-        Management.
-      </DemoNotice>
+      {notice && (
+        <div
+          role="status"
+          className={
+            notice.kind === "success"
+              ? "rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200"
+              : "rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200"
+          }
+        >
+          {notice.message}
+        </div>
+      )}
 
       <Section number={1} title="Employee">
         <Field id="employeeName" label="Employee name" required fullWidth>
@@ -174,19 +227,22 @@ export function AnnualLeaveForm() {
       <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
         <button
           type="button"
-          onClick={() => setValues(EMPTY)}
-          className="inline-flex h-10 items-center justify-center rounded-md border border-zinc-300 bg-white px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          onClick={() => {
+            setValues(EMPTY);
+            setNotice(null);
+          }}
+          disabled={submitting}
+          className="inline-flex h-10 items-center justify-center rounded-md border border-zinc-300 bg-white px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
         >
           Reset form
         </button>
         <button
           type="button"
-          disabled
-          aria-disabled="true"
-          title="Demo only — export and email not connected yet."
-          className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-md bg-zinc-900 px-5 text-sm font-medium text-white opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
+          onClick={onGenerate}
+          disabled={submitting}
+          className="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
         >
-          Submit leave request
+          {submitting ? "Generating…" : "Submit leave request"}
         </button>
       </div>
     </form>
