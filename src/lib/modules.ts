@@ -43,7 +43,7 @@ export const MODULES: PortalModule[] = [
     title: "Warranty Claim Submission",
     description: "Submit a warranty claim against a supplied product.",
     href: "/forms/warranty",
-    status: "demo",
+    status: "active",
     category: "Operations",
   },
   {

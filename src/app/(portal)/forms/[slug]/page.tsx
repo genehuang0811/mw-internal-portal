@@ -5,6 +5,7 @@ import { DemoForm } from "@/components/demo-form";
 import { AnnualLeaveForm } from "@/components/annual-leave-form";
 import { VehicleInspectionForm } from "@/components/vehicle-inspection-form";
 import { JobCardForm } from "@/components/job-card-form";
+import { WarrantyForm } from "@/components/warranty-form";
 import { PageHeader } from "@/components/page-header";
 import { getDemoForm } from "@/lib/demo-forms";
 import { MODULES, findModuleByHref } from "@/lib/modules";
@@ -22,6 +23,7 @@ const BESPOKE_FORMS: Record<string, () => ReactNode> = {
   "annual-leave": () => <AnnualLeaveForm />,
   "vehicle-inspection": () => <VehicleInspectionForm />,
   "job-card": () => <JobCardForm />,
+  warranty: () => <WarrantyForm />,
 };
 
 export function generateStaticParams(): Array<Params> {

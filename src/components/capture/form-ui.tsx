@@ -1,6 +1,39 @@
 import type { ReactNode } from "react";
+import type { ZodType } from "zod";
 
 /** Shared presentational form building blocks for the bespoke live forms. */
+
+/**
+ * Validate a raw string payload against a document schema and return either the
+ * parsed data or a flat `{ field: message }` error map (first message per
+ * field). Lets every live form validate with the exact schema the engine uses.
+ */
+export function validateForm<TOut>(
+  schema: ZodType<TOut>,
+  payload: unknown,
+):
+  | { ok: true; data: TOut }
+  | { ok: false; errors: Record<string, string> } {
+  const parsed = schema.safeParse(payload);
+  if (parsed.success) return { ok: true, data: parsed.data };
+  const flat = parsed.error.flatten();
+  const fieldErrors = flat.fieldErrors as Record<string, string[] | undefined>;
+  const errors: Record<string, string> = {};
+  for (const [k, msgs] of Object.entries(fieldErrors)) {
+    if (msgs && msgs.length > 0) errors[k] = msgs[0]!;
+  }
+  return { ok: false, errors };
+}
+
+/** Smooth-scroll to the first errored field (`field-{id}`). */
+export function scrollToFirstError(errors: Record<string, string>): void {
+  const first = Object.keys(errors)[0];
+  if (first) {
+    document
+      .getElementById(`field-${first}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
 
 export function Section({
   number,
