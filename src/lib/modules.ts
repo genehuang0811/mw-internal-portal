@@ -59,7 +59,7 @@ export const MODULES: PortalModule[] = [
     title: "Job Card Generator",
     description: "Create a job card for the workshop.",
     href: "/forms/job-card",
-    status: "demo",
+    status: "active",
     category: "Operations",
   },
   {

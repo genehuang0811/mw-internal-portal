@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import { DemoNotice } from "./demo-notice";
 import { SignaturePad } from "./capture/signature-pad";
 import {
   Section,
@@ -14,7 +13,7 @@ import {
   inputClass,
   type Notice,
 } from "./capture/form-ui";
-import { downloadDocument } from "@/lib/download-document";
+import { submitDocument, sentMessage } from "@/lib/submit-document";
 
 const CHECKLIST_LABELS = [
   "Vehicle received & inspected",
@@ -100,7 +99,7 @@ export function JobCardForm() {
     }
     setSubmitting(true);
     try {
-      const result = await downloadDocument("job-card", {
+      const result = await submitDocument("job-card", {
         ...v,
         parts: parts
           .filter((p) => p.description.trim())
@@ -111,7 +110,7 @@ export function JobCardForm() {
       });
       setNotice(
         result.ok
-          ? { kind: "success", message: `Generated ${result.filename}. Download started.` }
+          ? { kind: "success", message: sentMessage(result) }
           : { kind: "error", message: result.error },
       );
     } finally {
@@ -121,11 +120,6 @@ export function JobCardForm() {
 
   return (
     <form noValidate onSubmit={(e) => e.preventDefault()} className="space-y-6">
-      <DemoNotice>
-        Generates a branded MW PDF (parts, checklist &amp; sign-off included).
-        Cloud upload &amp; email coming later.
-      </DemoNotice>
-
       <NoticeBanner notice={notice} />
 
       <Section number={1} title="Order & Customer">
