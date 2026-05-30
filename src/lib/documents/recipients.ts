@@ -13,6 +13,7 @@ export const RECIPIENTS: Record<string, string[]> = {
   "annual-leave": [...DEFAULT],
   "job-card": [...DEFAULT],
   "anonymous-feedback": [...DEFAULT],
+  procurement: [...DEFAULT],
 };
 
 /** Recipients for a document slug, falling back to the default inbox. */
